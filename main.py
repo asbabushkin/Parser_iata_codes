@@ -1,18 +1,20 @@
 import requests
+
 from bs4 import BeautifulSoup
+from fill_database import fill_airportcodes
 
 
 def get_airport_codes(url):
     """
     Получить данные о международных аэропортах России со страницы
     https://aviateka.su/all-airports/russia-all-airports/
-    и сохранить их в словарь с ключами: 'airport_name', 'country', 'city', 'IATA_code', 'ICAO_code',
-    'Rus_code', 'type', 'webpage'.
+    и сохранить их в словарь с ключами: 'airport_name', 'country', 'city', 'iata_code', 'icao_code',
+    'rus_code', 'type', 'webpage'.
     """
     links = []
     response = requests.get(url)
     soup = BeautifulSoup(response.text, 'html.parser')
-    keys = ['airport_name', 'country', 'city', 'iata_code', 'icao_code', 'rus_code', 'type', 'webpage']
+    keys = ['airport_name', 'country', 'city', 'iata_code', 'rus_code', 'icao_code', 'type', 'webpage']
     data = [[cell.text for cell in row.find_all('td')] for row in soup.find_all('tr') if row.find('td')]
     webpages = [row.find('a', class_='avt-bold-link')['href'] for row in soup.find_all('tr') if row.find('td')]
     for w in webpages:
@@ -22,11 +24,13 @@ def get_airport_codes(url):
         links.append(link.find_next().text.strip())
 
     links[47] = 'https://avia.gazprom.ru/ostafevo'
+    data[41][1] = 'Аэропорт Нижний Новгород Стригино'
+    data[76][1] = 'Аэропорт Южно-Сахалинск Хомутово'
 
     for i in range(len(data)):
         del data[i][0]
-        data[i].insert(1, 'Russia')
-        data[i].append('international')
+        data[i].insert(1, 'Россия')
+        data[i].append('международный')
         data[i][0] = data[i][0].split('\n')[0]
         data[i].append(webpages[i])
 
@@ -58,3 +62,4 @@ if __name__ == '__main__':
     print(airport_codes)
     city_codes = get_city_codes('https://aviakassir.info/tools/citycode/country.html?country=RU')
     print(city_codes)
+    fill_airportcodes(airport_codes)
