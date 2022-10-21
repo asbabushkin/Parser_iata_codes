@@ -1,7 +1,6 @@
 import requests
-
 from bs4 import BeautifulSoup
-from fill_database import fill_airportcodes
+from fill_database import *
 
 
 def get_airport_codes(url):
@@ -59,7 +58,9 @@ def get_city_codes(url):
 
 if __name__ == '__main__':
     airport_codes = get_airport_codes('https://aviateka.su/all-airports/russia-all-airports/')
-    print(airport_codes)
+    # данные внесены в БД, не декомментировать
+    # fill_airportcodes(airport_codes)
+
     city_codes = get_city_codes('https://aviakassir.info/tools/citycode/country.html?country=RU')
-    print(city_codes)
-    fill_airportcodes(airport_codes)
+    # данные внесены в БД, не декомментировать
+    # fill_citycodes(city_codes)
